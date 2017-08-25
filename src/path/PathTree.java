@@ -3,6 +3,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -35,6 +37,7 @@ public class PathTree extends JPanel {
 
     private JButton stopButton = new JButton("停止扫描");
     private JButton browseButton = new JButton("选择文件夹");
+    private JButton addReNameButton = new JButton("添加替换");
     private JTextArea pathsTextArea = new JTextArea();
     private JCheckBox showHiddenFilesCheckbox = new JCheckBox("显示隐藏文件", false);
 
@@ -44,6 +47,10 @@ public class PathTree extends JPanel {
     private boolean stopped = false; // 是否停止扫描的标志
     public JScrollPane JTreescroll;//树形区域
     private JTextArea textArea;//输入区域
+    private JTextArea oldfileNametextArea=new JTextArea();//旧文件名Po
+    private JTextArea newfileNametextArea=new JTextArea();//新文件名Po
+    private  JLabel oldfileNameLabel =new JLabel("旧文件Po名:");  
+    private  JLabel newfileNameLabel =new JLabel("新文件Po名:");  
     public PathTree() {
         initGui();
     }
@@ -52,12 +59,21 @@ public class PathTree extends JPanel {
     private void initGui() {
         this.setLayout(new BorderLayout());
 
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
-        buttonsPanel.add(showHiddenFilesCheckbox);
-        buttonsPanel.add(browseButton);
-        buttonsPanel.add(stopButton);
-        this.add(buttonsPanel, BorderLayout.NORTH);
+        JPanel northPanel = new JPanel();
+        northPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        northPanel.add(showHiddenFilesCheckbox);
+        northPanel.add(browseButton);
+        northPanel.add(stopButton);
+        northPanel.add(addReNameButton);
+        northPanel.add(new JLabel());
+        northPanel.setLayout(new GridLayout(2,5));  
+        northPanel.add(oldfileNameLabel);
+        northPanel.add(oldfileNametextArea);
+        oldfileNametextArea.setLineWrap(true);
+        northPanel.add(newfileNameLabel);
+        northPanel.add(newfileNametextArea);
+        newfileNametextArea.setLineWrap(true);
+        this.add(northPanel, BorderLayout.NORTH);
 
         JScrollPane scroller = new JScrollPane(pathsTextArea);
         scroller.setBorder(null);
@@ -76,6 +92,7 @@ public class PathTree extends JPanel {
       JScrollPane panel = new JScrollPane(textArea,
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+      panel.setPreferredSize(new Dimension(0, 300));
       this.add(panel, BorderLayout.SOUTH);
         
         browseButton.addActionListener(new ActionListener() {
