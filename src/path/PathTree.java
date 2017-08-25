@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -24,13 +25,13 @@ import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeModel;
 
-import Utils.TextAreaUtils;
 import treedemo.CheckBoxTreeCellRenderer;
 import treedemo.CheckBoxTreeNode;
 import treedemo.CheckBoxTreeNodeSelectionListener;
+import Utils.TextAreaUtils;
+import bean.ReNamePaneBean;
 
 public class PathTree extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -40,17 +41,19 @@ public class PathTree extends JPanel {
     private JButton addReNameButton = new JButton("添加替换");
     private JTextArea pathsTextArea = new JTextArea();
     private JCheckBox showHiddenFilesCheckbox = new JCheckBox("显示隐藏文件", false);
-
+    private  JPanel northPanel = new JPanel(); ;
     private Map<Integer, String> pathIndexes = new HashMap<Integer, String>();
     private FileFilter docFilter = new DocFilter(); // 文档过滤器
     private FileFilter dirFilter = new DirFilter(); // 文件夹过滤器
     private boolean stopped = false; // 是否停止扫描的标志
-    public JScrollPane JTreescroll;//树形区域
-    private JTextArea textArea;//输入区域
     private JTextArea oldfileNametextArea=new JTextArea();//旧文件名Po
     private JTextArea newfileNametextArea=new JTextArea();//新文件名Po
     private  JLabel oldfileNameLabel =new JLabel("旧文件Po名:");  
     private  JLabel newfileNameLabel =new JLabel("新文件Po名:");  
+    public JScrollPane JTreescroll;//树形区域
+    public JTextArea textArea;//输入区域
+    public Map<Integer,ReNamePaneBean> ReNameSaveMap=new LinkedHashMap<>();//保存reName对象 Map
+    
     public PathTree() {
         initGui();
     }
@@ -59,20 +62,7 @@ public class PathTree extends JPanel {
     private void initGui() {
         this.setLayout(new BorderLayout());
 
-        JPanel northPanel = new JPanel();
-        northPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
-        northPanel.add(showHiddenFilesCheckbox);
-        northPanel.add(browseButton);
-        northPanel.add(stopButton);
-        northPanel.add(addReNameButton);
-        northPanel.add(new JLabel());
-        northPanel.setLayout(new GridLayout(2,5));  
-        northPanel.add(oldfileNameLabel);
-        northPanel.add(oldfileNametextArea);
-        oldfileNametextArea.setLineWrap(true);
-        northPanel.add(newfileNameLabel);
-        northPanel.add(newfileNametextArea);
-        newfileNametextArea.setLineWrap(true);
+        loadNorthPanel();
         this.add(northPanel, BorderLayout.NORTH);
 
         JScrollPane scroller = new JScrollPane(pathsTextArea);
@@ -128,8 +118,65 @@ public class PathTree extends JPanel {
                 stopped = true;
             }
         });
+        
+        addReNameButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	Integer MaxKey=0;
+            	  for(Integer key:ReNameSaveMap.keySet()){
+            		  MaxKey=key;
+            	  }
+            		ReNameSaveMap.put(MaxKey+1,new ReNamePaneBean());
+            		loadNorthPanel();
+            }
+        });
     }
 
+	private void loadNorthPanel() {
+		northPanel.removeAll();
+		northPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        northPanel.add(showHiddenFilesCheckbox);
+        northPanel.add(browseButton);
+        northPanel.add(stopButton);
+        northPanel.add(addReNameButton);
+        northPanel.add(new JLabel());
+        
+        northPanel.add(oldfileNameLabel);
+        northPanel.add(oldfileNametextArea);
+        oldfileNametextArea.setLineWrap(true);
+        northPanel.add(newfileNameLabel);
+        northPanel.add(newfileNametextArea);
+        northPanel.add(new JLabel());
+        newfileNametextArea.setLineWrap(true);
+        for(Integer key:ReNameSaveMap.keySet()){
+        	System.out.println(key);
+        	ReNamePaneBean reNamePaneBean=ReNameSaveMap.get(key);
+        	northPanel.add(new JLabel("原字段:"));
+            northPanel.add(reNamePaneBean.getOldNametextArea());
+            reNamePaneBean.getOldNametextArea().setLineWrap(true);
+            northPanel.add(new JLabel("该更为:"));
+            northPanel.add(reNamePaneBean.getNewNametextArea());
+            reNamePaneBean.getNewNametextArea().setLineWrap(true);
+            JButton deleteButton=new JButton("删除");
+            deleteButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                	deleteReNamePaneBean(key);
+                }
+
+				
+            });
+            northPanel.add(deleteButton);
+        }
+        northPanel.setLayout(new GridLayout(2+ReNameSaveMap.size(),5));
+        northPanel.updateUI();
+	}
+	//删除替换字段方法
+	private void deleteReNamePaneBean(Integer key) {
+		ReNameSaveMap.remove(key);
+		loadNorthPanel();
+		
+	}
     // 递归遍历目录树
     private void walkTree(File dir, int level,CheckBoxTreeNode parentNode) {
         // 1. current dir path
