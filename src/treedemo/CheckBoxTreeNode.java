@@ -41,9 +41,7 @@ public class CheckBoxTreeNode extends DefaultMutableTreeNode
                     if(_isSelected != node.isSelected())  
                         node.setSelected(_isSelected);  
                 }  
-            }else{
-            	 System.out.println(this.getUserObject());
-            }  
+            } 
             // 向上检查，如果父结点的所有子结点都被选中，那么将父结点也选中  
             CheckBoxTreeNode pNode = (CheckBoxTreeNode)parent;  
             // 开始检查pNode的所有子节点是否都被选中  

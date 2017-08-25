@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeModel;
 
+import Utils.TextAreaUtils;
 import treedemo.CheckBoxTreeCellRenderer;
 import treedemo.CheckBoxTreeNode;
 import treedemo.CheckBoxTreeNodeSelectionListener;
@@ -65,7 +66,7 @@ public class PathTree extends JPanel {
         
         
         JTree tree = new JTree();  
-        tree.addMouseListener(new CheckBoxTreeNodeSelectionListener());  
+        tree.addMouseListener(new CheckBoxTreeNodeSelectionListener(this));  
        JTreescroll = new JScrollPane(tree);  
       this.add(JTreescroll, BorderLayout.WEST);
       
@@ -233,6 +234,9 @@ public class PathTree extends JPanel {
         
     }
 
+    public void readFileToTextArea(String file){
+    	textArea.setText(TextAreaUtils.read(file, "GBK", "gb2312"));
+    }
  
 }
 
