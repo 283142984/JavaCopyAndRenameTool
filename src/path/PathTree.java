@@ -2,6 +2,7 @@ package path;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeModel;
@@ -38,9 +40,9 @@ public class PathTree extends JPanel {
     private Map<Integer, String> pathIndexes = new HashMap<Integer, String>();
     private FileFilter docFilter = new DocFilter(); // 文档过滤器
     private FileFilter dirFilter = new DirFilter(); // 文件夹过滤器
-    public JScrollPane JTreescroll;
     private boolean stopped = false; // 是否停止扫描的标志
-
+    public JScrollPane JTreescroll;//树形区域
+    private JTextArea textArea;//输入区域
     public PathTree() {
         initGui();
     }
@@ -63,29 +65,17 @@ public class PathTree extends JPanel {
         
         
         JTree tree = new JTree();  
-//      CheckBoxTreeNode rootNode = new CheckBoxTreeNode("root");  
-//      CheckBoxTreeNode node1 = new CheckBoxTreeNode("node_1");  
-//      CheckBoxTreeNode node1_1 = new CheckBoxTreeNode("node_1_1");  
-//      CheckBoxTreeNode node1_2 = new CheckBoxTreeNode("node_1_2");  
-//      CheckBoxTreeNode node1_3 = new CheckBoxTreeNode("node_1_3");  
-//      node1.add(node1_1);  
-//      node1.add(node1_2);  
-//      node1.add(node1_3);  
-//      CheckBoxTreeNode node2 = new CheckBoxTreeNode("node_2");  
-//      CheckBoxTreeNode node2_1 = new CheckBoxTreeNode("node_2_1");  
-//      CheckBoxTreeNode node2_2 = new CheckBoxTreeNode("node_2_2");  
-//      node2.add(node2_1);  
-//      node2.add(node2_2);  
-//      rootNode.add(node1);  
-//      rootNode.add(node2);  
-//      DefaultTreeModel model = new DefaultTreeModel(rootNode);  
-//      tree.addMouseListener(new CheckBoxTreeNodeSelectionListener());  
-//      tree.setModel(model);  
-//      tree.setCellRenderer(new CheckBoxTreeCellRenderer());  
         tree.addMouseListener(new CheckBoxTreeNodeSelectionListener());  
        JTreescroll = new JScrollPane(tree);  
-//      scroll.setBounds(0, 0, 1000, 1000);  
       this.add(JTreescroll, BorderLayout.WEST);
+      
+      textArea = new JTextArea();
+      textArea.setFont(new Font("细明体", Font.PLAIN, 16));
+      textArea.setLineWrap(true);
+      JScrollPane panel = new JScrollPane(textArea,
+              ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+      this.add(panel, BorderLayout.SOUTH);
         
         browseButton.addActionListener(new ActionListener() {
             @Override
@@ -101,21 +91,7 @@ public class PathTree extends JPanel {
                         public void run() {
                             File dir = chooser.getSelectedFile();
                             pathsTextArea.setText("");
-                            CheckBoxTreeNode rootNode = new CheckBoxTreeNode(dir.toString());  
-//                          CheckBoxTreeNode node1 = new CheckBoxTreeNode("node_1");  
-//                          CheckBoxTreeNode node1_1 = new CheckBoxTreeNode("node_1_1");  
-//                          CheckBoxTreeNode node1_2 = new CheckBoxTreeNode("node_1_2");  
-//                          CheckBoxTreeNode node1_3 = new CheckBoxTreeNode("node_1_3");  
-//                          node1.add(node1_1);  
-//                          node1.add(node1_2);  
-//                          node1.add(node1_3);  
-//                          CheckBoxTreeNode node2 = new CheckBoxTreeNode("node_2");  
-//                          CheckBoxTreeNode node2_1 = new CheckBoxTreeNode("node_2_1");  
-//                          CheckBoxTreeNode node2_2 = new CheckBoxTreeNode("node_2_2");  
-//                          node2.add(node2_1);  
-//                          node2.add(node2_2);  
-//                          rootNode.add(node1);  
-//                          rootNode.add(node2);  
+                          CheckBoxTreeNode rootNode = new CheckBoxTreeNode(dir.toString());  
                           DefaultTreeModel model = new DefaultTreeModel(rootNode);  
                           tree.setModel(model);  
                           tree.setCellRenderer(new CheckBoxTreeCellRenderer());  

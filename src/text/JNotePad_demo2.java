@@ -214,6 +214,7 @@ public class JNotePad_demo2 extends JFrame{
         }
     }
     private void closeFile(ActionEvent event) {
+        dispose();/*//释放窗口资源,关闭程序
         if(stateBar.getText().equals("未修改")){
             dispose();//释放窗口资源,关闭程序
         }else{
@@ -228,11 +229,13 @@ public class JNotePad_demo2 extends JFrame{
                 case JOptionPane.NO_OPTION:
                     dispose();
             }
-        }
+        }*/
     }
 
 
     private void openFile(ActionEvent event) {
+    	 showFileDialog();
+    	/*
         if(stateBar.getText().equals("未修改")){
             showFileDialog();
         } else{
@@ -251,7 +254,7 @@ public class JNotePad_demo2 extends JFrame{
             }
         }
 
-    }
+    */}
 
     private void jtexAreaActionPerformed(KeyEvent event) {
         stateBar.setText("已修改");
