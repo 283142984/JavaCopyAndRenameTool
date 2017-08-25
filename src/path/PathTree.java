@@ -18,8 +18,14 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.tree.DefaultTreeModel;
+
+import treedemo.CheckBoxTreeCellRenderer;
+import treedemo.CheckBoxTreeNode;
+import treedemo.CheckBoxTreeNodeSelectionListener;
 
 public class PathTree extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -32,7 +38,7 @@ public class PathTree extends JPanel {
     private Map<Integer, String> pathIndexes = new HashMap<Integer, String>();
     private FileFilter docFilter = new DocFilter(); // 文档过滤器
     private FileFilter dirFilter = new DirFilter(); // 文件夹过滤器
-
+    public JScrollPane JTreescroll;
     private boolean stopped = false; // 是否停止扫描的标志
 
     public PathTree() {
@@ -54,6 +60,33 @@ public class PathTree extends JPanel {
         scroller.setBorder(null);
         this.add(scroller, BorderLayout.CENTER);
 
+        
+        
+        JTree tree = new JTree();  
+//      CheckBoxTreeNode rootNode = new CheckBoxTreeNode("root");  
+//      CheckBoxTreeNode node1 = new CheckBoxTreeNode("node_1");  
+//      CheckBoxTreeNode node1_1 = new CheckBoxTreeNode("node_1_1");  
+//      CheckBoxTreeNode node1_2 = new CheckBoxTreeNode("node_1_2");  
+//      CheckBoxTreeNode node1_3 = new CheckBoxTreeNode("node_1_3");  
+//      node1.add(node1_1);  
+//      node1.add(node1_2);  
+//      node1.add(node1_3);  
+//      CheckBoxTreeNode node2 = new CheckBoxTreeNode("node_2");  
+//      CheckBoxTreeNode node2_1 = new CheckBoxTreeNode("node_2_1");  
+//      CheckBoxTreeNode node2_2 = new CheckBoxTreeNode("node_2_2");  
+//      node2.add(node2_1);  
+//      node2.add(node2_2);  
+//      rootNode.add(node1);  
+//      rootNode.add(node2);  
+//      DefaultTreeModel model = new DefaultTreeModel(rootNode);  
+//      tree.addMouseListener(new CheckBoxTreeNodeSelectionListener());  
+//      tree.setModel(model);  
+//      tree.setCellRenderer(new CheckBoxTreeCellRenderer());  
+        tree.addMouseListener(new CheckBoxTreeNodeSelectionListener());  
+       JTreescroll = new JScrollPane(tree);  
+//      scroll.setBounds(0, 0, 1000, 1000);  
+      this.add(JTreescroll, BorderLayout.WEST);
+        
         browseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -68,8 +101,26 @@ public class PathTree extends JPanel {
                         public void run() {
                             File dir = chooser.getSelectedFile();
                             pathsTextArea.setText("");
+                            CheckBoxTreeNode rootNode = new CheckBoxTreeNode(dir.toString());  
+//                          CheckBoxTreeNode node1 = new CheckBoxTreeNode("node_1");  
+//                          CheckBoxTreeNode node1_1 = new CheckBoxTreeNode("node_1_1");  
+//                          CheckBoxTreeNode node1_2 = new CheckBoxTreeNode("node_1_2");  
+//                          CheckBoxTreeNode node1_3 = new CheckBoxTreeNode("node_1_3");  
+//                          node1.add(node1_1);  
+//                          node1.add(node1_2);  
+//                          node1.add(node1_3);  
+//                          CheckBoxTreeNode node2 = new CheckBoxTreeNode("node_2");  
+//                          CheckBoxTreeNode node2_1 = new CheckBoxTreeNode("node_2_1");  
+//                          CheckBoxTreeNode node2_2 = new CheckBoxTreeNode("node_2_2");  
+//                          node2.add(node2_1);  
+//                          node2.add(node2_2);  
+//                          rootNode.add(node1);  
+//                          rootNode.add(node2);  
+                          DefaultTreeModel model = new DefaultTreeModel(rootNode);  
+                          tree.setModel(model);  
+                          tree.setCellRenderer(new CheckBoxTreeCellRenderer());  
                             stopped = false;
-                            walkTree(dir, 0);
+                            walkTree(dir, 0,rootNode);
                         }
                     });
                     t.start();
@@ -86,11 +137,12 @@ public class PathTree extends JPanel {
     }
 
     // 递归遍历目录树
-    private void walkTree(File dir, int level) {
+    private void walkTree(File dir, int level,CheckBoxTreeNode parentNode) {
         // 1. current dir path
         // 2. docs path that located in this dir
         // 3. sub dirs path
-
+    	if(parentNode==null){return;}
+    	CheckBoxTreeNode childrenNode=null;
         if (stopped) { return; }
 
         // 如果不显示隐藏文件，则返回
@@ -100,6 +152,7 @@ public class PathTree extends JPanel {
 
         // 访问当前目录
         pathBuffer.append(createPath(dir, level));
+//         childrenNode = new CheckBoxTreeNode(); 
 
         // 访问文档
         for (File doc : dir.listFiles(docFilter)) {
@@ -107,6 +160,9 @@ public class PathTree extends JPanel {
                 continue;
             }
             pathBuffer.append(createPath(doc, level + 1));
+            
+            childrenNode = new CheckBoxTreeNode(doc); 
+            parentNode.add(childrenNode);
         }
 
         // 把当前目录下的文件更新到text area中
@@ -119,7 +175,9 @@ public class PathTree extends JPanel {
 
         // 递归遍历子目录
         for (File subDir : dir.listFiles(dirFilter)) {
-            walkTree(subDir, level + 1);
+        	childrenNode = new CheckBoxTreeNode(subDir); 
+            parentNode.add(childrenNode);
+            walkTree(subDir, level + 1,childrenNode);
         }
     }
 
@@ -149,10 +207,10 @@ public class PathTree extends JPanel {
     }
 
     // 创建主窗口
-    private static void createGUIAndShow() {
+    static void createGUIAndShow() {
         JFrame frame = new JFrame("目录结构树");
-        frame.setContentPane(new PathTree());
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      
+        
 
         Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
         int w = 600;
@@ -162,24 +220,44 @@ public class PathTree extends JPanel {
         x = x > 0 ? x : 0;
         y = y > 0 ? y : 0;
         frame.setBounds(x, y, w, h);
+      
+        
+//        JFrame frame = new JFrame("CheckBoxTreeDemo");  
+//        frame.setBounds(200, 200, 600, 700);  
+//        JTree tree = new JTree();  
+//        CheckBoxTreeNode rootNode = new CheckBoxTreeNode("root");  
+//        CheckBoxTreeNode node1 = new CheckBoxTreeNode("node_1");  
+//        CheckBoxTreeNode node1_1 = new CheckBoxTreeNode("node_1_1");  
+//        CheckBoxTreeNode node1_2 = new CheckBoxTreeNode("node_1_2");  
+//        CheckBoxTreeNode node1_3 = new CheckBoxTreeNode("node_1_3");  
+//        node1.add(node1_1);  
+//        node1.add(node1_2);  
+//        node1.add(node1_3);  
+//        CheckBoxTreeNode node2 = new CheckBoxTreeNode("node_2");  
+//        CheckBoxTreeNode node2_1 = new CheckBoxTreeNode("node_2_1");  
+//        CheckBoxTreeNode node2_2 = new CheckBoxTreeNode("node_2_2");  
+//        node2.add(node2_1);  
+//        node2.add(node2_2);  
+//        rootNode.add(node1);  
+//        rootNode.add(node2);  
+//        DefaultTreeModel model = new DefaultTreeModel(rootNode);  
+//        tree.addMouseListener(new CheckBoxTreeNodeSelectionListener());  
+//        tree.setModel(model);  
+//        tree.setCellRenderer(new CheckBoxTreeCellRenderer());  
+//        JScrollPane scroll = new JScrollPane(tree);  
+//        scroll.setBounds(0, 0, 300, 320);  
+//        frame.getContentPane().add(scroll);  
+          
+        frame.setContentPane(new PathTree());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        
+        
         frame.setVisible(true);
+        
+        
     }
 
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-            //UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                createGUIAndShow();
-            }
-        });
-    }
+ 
 }
 
 class DocFilter implements FileFilter {

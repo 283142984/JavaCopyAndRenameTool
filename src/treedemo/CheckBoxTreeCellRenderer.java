@@ -38,7 +38,10 @@ public class CheckBoxTreeCellRenderer extends JPanel implements TreeCellRenderer
         setEnabled(tree.isEnabled());  
         check.setSelected(((CheckBoxTreeNode)value).isSelected());  
         label.setFont(tree.getFont());  
-        label.setText(stringValue);  
+        //目录显示优化
+        int fileNameNumber= stringValue.lastIndexOf("\\");
+        label.setText( stringValue.substring(fileNameNumber+1));  
+        
         label.setSelected(selected);  
         label.setFocus(hasFocus);  
         if(leaf)  
