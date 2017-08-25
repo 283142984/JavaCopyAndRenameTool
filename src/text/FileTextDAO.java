@@ -1,4 +1,4 @@
-package Text;
+package text;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;

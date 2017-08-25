@@ -1,4 +1,4 @@
-package Text;
+package text;
 /**
  * Created by butter on 16-11-21.
  */

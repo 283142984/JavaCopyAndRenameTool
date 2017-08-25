@@ -1,4 +1,4 @@
-package Text;
+package text;
 
 import javax.swing.*;
 import javax.xml.soap.Text;
