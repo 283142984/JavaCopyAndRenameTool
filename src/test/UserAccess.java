@@ -48,13 +48,12 @@ public class UserAccess
         panel_small_2.setLayout(new FlowLayout());  
         panel_small_2.add(pswfd_password);  
   
-        panel_bottom.setLayout(new FlowLayout());  
+        panel_bottom.setLayout(new FlowLayout(FlowLayout.RIGHT));  
         JButton btn_login=new JButton("Login");  
-        JButton btn_register=new JButton("register");  
+//        JButton btn_register=new JButton("register");  
         JButton btn_cancle=new JButton("cancle");  
         //Does cancle mean "clear the textfile" or "close the frame"?  
         panel_bottom.add(btn_login);  
-        panel_bottom.add(btn_register);  
         panel_bottom.add(btn_cancle);  
   
   

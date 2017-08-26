@@ -1,19 +1,20 @@
-package treedemo;
+package pathTree;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
+import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import path.PathTree;  
+import main.MainJPanel;
   
 public class CheckBoxTreeNodeSelectionListener extends MouseAdapter  
-{  PathTree pathTree;
-    public CheckBoxTreeNodeSelectionListener(PathTree pathTree) {
+{  MainJPanel mainJPanel;
+    public CheckBoxTreeNodeSelectionListener(MainJPanel mainJPanel) {
 		super();
-		this.pathTree=pathTree;
+		this.mainJPanel=mainJPanel;
 	}
 
 	@Override  
@@ -33,7 +34,14 @@ public class CheckBoxTreeNodeSelectionListener extends MouseAdapter
                 node.setSelected(isSelected);  
                 System.out.println(node);
                 if(node.getChildCount()==0){//说明是最后的
-                	pathTree.readFileToTextArea(node.toString());
+                	mainJPanel.readFileToTextArea(node.toString());
+                	
+                	if(isSelected){//同时选中
+                		node.newPathArea(node);
+                	   }else{
+                		   node.deletePathArea(node);
+                	   }
+                	
                 }
                 ((DefaultTreeModel)tree.getModel()).nodeStructureChanged(node);  
             }  

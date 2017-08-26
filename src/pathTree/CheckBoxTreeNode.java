@@ -1,18 +1,22 @@
-package treedemo;
-import javax.swing.tree.DefaultMutableTreeNode;  
+package pathTree;
+import javax.swing.JTextArea;
+import javax.swing.tree.DefaultMutableTreeNode;
+
+import main.MainJPanel;
   
 public class CheckBoxTreeNode extends DefaultMutableTreeNode  
-{  
+{   MainJPanel mainJPanel;
     protected boolean isSelected;  
       
     public CheckBoxTreeNode()  
     {  
-        this(null);  
+        super(null);  
     }  
       
-    public CheckBoxTreeNode(Object userObject)  
-    {  
-        this(userObject, true, false);  
+    public CheckBoxTreeNode(Object userObject, MainJPanel mainJPanel)  
+    { 
+        this(userObject, true, false);
+        this.mainJPanel=mainJPanel;
     }  
       
     public CheckBoxTreeNode(Object userObject, boolean allowsChildren, boolean isSelected)  
@@ -39,7 +43,11 @@ public class CheckBoxTreeNode extends DefaultMutableTreeNode
                 {  
                     CheckBoxTreeNode node = (CheckBoxTreeNode)obj;  
                     if(_isSelected != node.isSelected())  
-                        node.setSelected(_isSelected);  
+                        {node.setSelected(_isSelected);
+                    
+                        newPathArea(node);
+                        
+                        }  
                 }  
             } 
             // 向上检查，如果父结点的所有子结点都被选中，那么将父结点也选中  
@@ -89,7 +97,9 @@ public class CheckBoxTreeNode extends DefaultMutableTreeNode
                     {  
                         CheckBoxTreeNode node = (CheckBoxTreeNode)children.get(i);  
                         if(node.isSelected() != _isSelected)  
-                            node.setSelected(_isSelected);  
+                            {node.setSelected(_isSelected);
+                            deletePathArea(node);
+                            }  
                     }  
                 }  
             }  
@@ -99,5 +109,17 @@ public class CheckBoxTreeNode extends DefaultMutableTreeNode
             if(pNode != null && pNode.isSelected() != _isSelected)  
                 pNode.setSelected(_isSelected);  
         }  
-    }  
+    }
+
+	public void newPathArea(CheckBoxTreeNode node) {
+		JTextArea oldPathNametextArea=new JTextArea(node.toString());
+		oldPathNametextArea.setEnabled(false);
+		 String areaString=  node.toString();
+		 areaString=  areaString.substring( 0,areaString.lastIndexOf("\\")+1)+"copy_"+areaString.substring(areaString.lastIndexOf("\\")+1);
+		 JTextArea newPathNametextArea=new JTextArea(areaString);
+		mainJPanel.putPathPaneBean(node.toString(),oldPathNametextArea,newPathNametextArea);
+	} 
+	public void deletePathArea(CheckBoxTreeNode node) {
+		  mainJPanel.deletePathPaneBean(node.toString());
+	} 
 }  
