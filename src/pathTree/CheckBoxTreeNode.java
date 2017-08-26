@@ -112,10 +112,22 @@ public class CheckBoxTreeNode extends DefaultMutableTreeNode
     }
 
 	public void newPathArea(CheckBoxTreeNode node) {
+		if(node.getChildCount()!=0)return;
 		JTextArea oldPathNametextArea=new JTextArea(node.toString());
 		oldPathNametextArea.setEnabled(false);
 		 String areaString=  node.toString();
-		 areaString=  areaString.substring( 0,areaString.lastIndexOf("\\")+1)+"copy_"+areaString.substring(areaString.lastIndexOf("\\")+1);
+		String beforeFileNamePath= areaString.substring( 0,areaString.lastIndexOf("\\")+1);
+		String fileName=areaString.substring(areaString.lastIndexOf("\\")+1);
+		 String  oldfileName=mainJPanel.oldfileNametextArea.getText();
+		String  newfileName=mainJPanel.newfileNametextArea.getText();
+
+		if(oldfileName.trim().equals("")||newfileName.trim().equals("")){
+			areaString= beforeFileNamePath+"copy_"+fileName;
+		}
+		else{
+			fileName=	fileName.replaceAll(oldfileName, newfileName);
+			areaString= beforeFileNamePath+fileName;
+		}
 		 JTextArea newPathNametextArea=new JTextArea(areaString);
 		mainJPanel.putPathPaneBean(node.toString(),oldPathNametextArea,newPathNametextArea);
 	} 

@@ -12,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileFilter;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -22,12 +21,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeModel;
 
 import pathTree.CheckBoxTreeCellRenderer;
@@ -42,7 +41,7 @@ public class MainJPanel extends JPanel {
 
     private JButton stopButton = new JButton("停止扫描（未开始）");
     private JButton browseButton = new JButton("选择文件夹");
-    private JButton addReNameButton = new JButton("添加替换");
+    private JButton addReNameButton = new JButton("添加替换字段");
     private JCheckBox showHiddenFilesCheckbox = new JCheckBox("显示隐藏文件", false);
     private  JPanel northPanel = new JPanel();
     private  JPanel centerPanel = new JPanel();
@@ -52,17 +51,17 @@ public class MainJPanel extends JPanel {
     private FileFilter docFilter = new DocFilter(); // 文档过滤器
     private FileFilter dirFilter = new DirFilter(); // 文件夹过滤器
     private boolean stopped = false; // 是否停止扫描的标志
-    private JTextArea oldfileNametextArea=new JTextArea();//旧文件名Po
-    private JTextArea newfileNametextArea=new JTextArea();//新文件名Po
-    public  JLabel oldfileNameLabel =new JLabel("旧文件Po名:");  
-    public  JLabel newfileNameLabel =new JLabel("新文件Po名:");  
+    public JTextArea oldfileNametextArea=new JTextArea();//旧文件名Po
+    public JTextArea newfileNametextArea=new JTextArea();//新文件名Po
+    private  JLabel oldfileNameLabel =new JLabel("旧文件Po名:");  
+    private  JLabel newfileNameLabel =new JLabel("新文件Po名:");  
     public JScrollPane jTreescroll;//树形区域
     public JTextArea textArea;//输入区域
-    public Map<Integer,ReNamePaneBean> reNameSaveMap=new LinkedHashMap<>();//保存reName对象 Map
+    public Map<Integer,ReNamePaneBean> reNamePaneBeanMap=new LinkedHashMap<>();//保存reName对象 Map
     public Map<String,PathPaneBean> pathPaneBeanMap=new LinkedHashMap<>();//保存path文件路径对象 Map
     private JButton replaceOldButton = new JButton("原文替换");
     private JButton copyAndReplaceButton = new JButton("复制并且替换");
-    
+    private String CharsetName="UTF-8";
     
     private MainJPanel mainJPanel;
     public MainJPanel() {
@@ -154,11 +153,74 @@ public class MainJPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
             	Integer MaxKey=0;
-            	  for(Integer key:reNameSaveMap.keySet()){
+            	  for(Integer key:reNamePaneBeanMap.keySet()){
             		  MaxKey=key;
             	  }
-            		reNameSaveMap.put(MaxKey+1,new ReNamePaneBean());
+            		reNamePaneBeanMap.put(MaxKey+1,new ReNamePaneBean());
             		loadNorthPanel();
+            }
+        });
+        
+        
+        replaceOldButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	if(reNamePaneBeanMap.size()==0){
+            		JOptionPane.showMessageDialog(null, "没有添加设置要替换的字段！", "错误", JOptionPane.ERROR_MESSAGE); 
+            		return;
+            	}
+            	if(pathPaneBeanMap.size()==0){
+            		JOptionPane.showMessageDialog(null, "没有选定文件！", "错误", JOptionPane.ERROR_MESSAGE); 
+            		return;
+            	}
+            	for(String key:pathPaneBeanMap.keySet()){
+            		PathPaneBean pathPaneBean=pathPaneBeanMap.get(key);
+            		String filePath=pathPaneBean.getOldPathNametextArea().getText();
+            		String fileContent=FileUtils.read(filePath, CharsetName);
+            	   	for(Integer k:reNamePaneBeanMap.keySet()){
+            	   		ReNamePaneBean reNamePaneBean=reNamePaneBeanMap.get(k);
+            		fileContent=fileContent.replaceAll(reNamePaneBean.getOldNametextArea().getText(),
+            				reNamePaneBean.getNewNametextArea().getText());
+            	   	
+            	   	}
+            		FileUtils.save(fileContent, filePath, CharsetName);
+            	}
+            	
+            	JOptionPane.showMessageDialog(null, "成功替换！", "成功", JOptionPane.OK_OPTION); 	
+            	
+            }
+        });
+        copyAndReplaceButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	if(reNamePaneBeanMap.size()==0){
+            		JOptionPane.showMessageDialog(null, "没有添加设置要替换的字段！", "错误", JOptionPane.ERROR_MESSAGE); 
+            		return;
+            	}
+            	if(pathPaneBeanMap.size()==0){
+            		JOptionPane.showMessageDialog(null, "没有选定文件！", "错误", JOptionPane.ERROR_MESSAGE); 
+            		return;
+            	}
+            	for(String key:pathPaneBeanMap.keySet()){
+            		PathPaneBean pathPaneBean=pathPaneBeanMap.get(key);
+            		String oldfilePath=pathPaneBean.getOldPathNametextArea().getText();
+            		String newfilePath=pathPaneBean.getNewPathNametextArea().getText().trim();
+            		
+            		FileUtils.fileChannelCopy(new File(oldfilePath), new File(newfilePath));
+            		
+            		String fileContent=FileUtils.read(newfilePath, CharsetName);
+            	   	for(Integer k:reNamePaneBeanMap.keySet()){
+            	   		ReNamePaneBean reNamePaneBean=reNamePaneBeanMap.get(k);
+            		fileContent=fileContent.replaceAll(reNamePaneBean.getOldNametextArea().getText(),
+            				reNamePaneBean.getNewNametextArea().getText());
+            	   	
+            	   	}
+            		FileUtils.save(fileContent, newfilePath, CharsetName);
+            	}
+            	
+            	JOptionPane.showMessageDialog(null, "成功复制并且替换！", "成功", JOptionPane.OK_OPTION); 	
+            	
+            
             }
         });
     }
@@ -185,9 +247,9 @@ public class MainJPanel extends JPanel {
         northPanel.add(newfileNametextArea);
         northPanel.add(new JLabel());
         newfileNametextArea.setLineWrap(true);
-        for(Integer key:reNameSaveMap.keySet()){
+        for(Integer key:reNamePaneBeanMap.keySet()){
         	System.out.println(key);
-        	ReNamePaneBean reNamePaneBean=reNameSaveMap.get(key);
+        	ReNamePaneBean reNamePaneBean=reNamePaneBeanMap.get(key);
         	northPanel.add(new JLabel("原字段:"));
             northPanel.add(reNamePaneBean.getOldNametextArea());
             reNamePaneBean.getOldNametextArea().setLineWrap(true);
@@ -205,7 +267,7 @@ public class MainJPanel extends JPanel {
             });
             northPanel.add(deleteButton);
         }
-        northPanel.setLayout(new GridLayout(2+reNameSaveMap.size(),5));
+        northPanel.setLayout(new GridLayout(2+reNamePaneBeanMap.size(),5));
         northPanel.updateUI();
 	}
 	
@@ -267,7 +329,7 @@ public class MainJPanel extends JPanel {
 	}
 	//删除替换字段方法
 	private void deleteReNamePaneBean(Integer key) {
-		reNameSaveMap.remove(key);
+		reNamePaneBeanMap.remove(key);
 		loadNorthPanel();
 		
 	}
@@ -365,7 +427,7 @@ public class MainJPanel extends JPanel {
     }
 
     public void readFileToTextArea(String file){
-    	textArea.setText(FileUtils.read(file,"UTF-8")); //"GBK", "gb2312"));
+    	textArea.setText(FileUtils.read(file,CharsetName)); //"GBK", "gb2312"));
     }
  
 }
