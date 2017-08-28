@@ -125,7 +125,10 @@ public class MainJPanel extends JPanel {
                         @Override
                         public void run() {
                             File dir = chooser.getSelectedFile();
-                          CheckBoxTreeNode rootNode = new CheckBoxTreeNode(dir.toString(),mainJPanel);  
+                          CheckBoxTreeNode rootNode = new CheckBoxTreeNode(dir.toString(),mainJPanel); 
+                          
+                          pathPaneBeanMap=new LinkedHashMap<>();
+                          loadCenterPathPanel();
                           DefaultTreeModel model = new DefaultTreeModel(rootNode);  
                           tree.setModel(model);  
                           tree.setCellRenderer(new CheckBoxTreeCellRenderer());  
