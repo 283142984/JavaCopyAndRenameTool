@@ -59,6 +59,8 @@ public class MainJPanel extends JPanel {
     public JTextArea textArea;//输入区域
     public Map<Integer,ReNamePaneBean> reNamePaneBeanMap=new LinkedHashMap<>();//保存reName对象 Map
     public Map<String,PathPaneBean> pathPaneBeanMap=new LinkedHashMap<>();//保存path文件路径对象 Map
+
+    private JButton reloadFileNameOldButton = new JButton("重写文件名");
     private JButton replaceOldButton = new JButton("原文替换");
     private JButton copyAndReplaceButton = new JButton("复制并且替换");
     private String CharsetName="UTF-8";
@@ -80,6 +82,7 @@ public class MainJPanel extends JPanel {
         centerPanel.setLayout(new BorderLayout());
         centerPanel.add(centerButtonPanel,BorderLayout.SOUTH);
         centerButtonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));  
+        centerButtonPanel.add(reloadFileNameOldButton);
         centerButtonPanel.add(replaceOldButton);
         centerButtonPanel.add(copyAndReplaceButton);
         
@@ -161,7 +164,35 @@ public class MainJPanel extends JPanel {
             }
         });
         
-        
+        reloadFileNameOldButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	
+            	for(String key:pathPaneBeanMap.keySet()){
+            		PathPaneBean pathPaneBean=pathPaneBeanMap.get(key);
+            		String oldfilePath=pathPaneBean.getOldPathNametextArea().getText();
+            		
+            		String  oldfileName=oldfileNametextArea.getText();
+            		String  newfileName=newfileNametextArea.getText();
+            		
+            		String newFilePath=  oldfilePath;
+            		
+            		String beforeFileNamePath= newFilePath.substring( 0,newFilePath.lastIndexOf("\\")+1);
+            		String fileName=newFilePath.substring(newFilePath.lastIndexOf("\\")+1);
+            			if(oldfileName.trim().equals("")||newfileName.trim().equals("")){
+            				newFilePath= beforeFileNamePath+"copy_"+fileName;
+            			}
+            			else{
+            				fileName=	fileName.replaceAll(oldfileName, newfileName);
+            				newFilePath= beforeFileNamePath+fileName;
+            			}
+            			pathPaneBean.getNewPathNametextArea().setText((newFilePath));
+            		
+            	}
+            	
+            	JOptionPane.showMessageDialog(null, "成功刷新！", "成功", JOptionPane.OK_OPTION); 	
+            }
+        });
         replaceOldButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
