@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -29,12 +30,12 @@ import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.DefaultTreeModel;
 
-import pathTree.CheckBoxTreeCellRenderer;
-import pathTree.CheckBoxTreeNode;
-import pathTree.CheckBoxTreeNodeSelectionListener;
 import Utils.FileUtils;
 import bean.PathPaneBean;
 import bean.ReNamePaneBean;
+import pathTree.CheckBoxTreeCellRenderer;
+import pathTree.CheckBoxTreeNode;
+import pathTree.CheckBoxTreeNodeSelectionListener;
 
 public class MainJPanel extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -58,13 +59,14 @@ public class MainJPanel extends JPanel {
     public JScrollPane jTreescroll;//树形区域
     public JTextArea textArea;//输入区域
     public Map<Integer,ReNamePaneBean> reNamePaneBeanMap=new LinkedHashMap<>();//保存reName对象 Map
-    public Map<String,PathPaneBean> pathPaneBeanMap=new LinkedHashMap<>();//保存path文件路径对象 Map
-
+    public Map<String,PathPaneBean> pathPaneBeanMap=new ConcurrentHashMap<>();//保存path文件路径对象 Map
+    private JButton reChooseFileButton = new JButton("重新选择文件");
     private JButton reloadFileNameOldButton = new JButton("重写文件名");
     private JButton replaceOldButton = new JButton("原文替换");
     private JButton copyAndReplaceButton = new JButton("复制并且替换");
     private String CharsetName="UTF-8";
-    
+    JTree tree = new JTree();  
+    CheckBoxTreeNode rootNode ;
     private MainJPanel mainJPanel;
     public MainJPanel() {
         initGui();
@@ -82,6 +84,7 @@ public class MainJPanel extends JPanel {
         centerPanel.setLayout(new BorderLayout());
         centerPanel.add(centerButtonPanel,BorderLayout.SOUTH);
         centerButtonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));  
+        centerButtonPanel.add(reChooseFileButton);
         centerButtonPanel.add(reloadFileNameOldButton);
         centerButtonPanel.add(replaceOldButton);
         centerButtonPanel.add(copyAndReplaceButton);
@@ -97,7 +100,6 @@ public class MainJPanel extends JPanel {
 
         
         //西边
-        JTree tree = new JTree();  
         tree.addMouseListener(new CheckBoxTreeNodeSelectionListener(this));  
        jTreescroll = new JScrollPane(tree);  
       this.add(jTreescroll, BorderLayout.WEST);
@@ -125,9 +127,9 @@ public class MainJPanel extends JPanel {
                         @Override
                         public void run() {
                             File dir = chooser.getSelectedFile();
-                          CheckBoxTreeNode rootNode = new CheckBoxTreeNode(dir.toString(),mainJPanel); 
+                           rootNode = new CheckBoxTreeNode(dir.toString(),mainJPanel); 
                           
-                          pathPaneBeanMap=new LinkedHashMap<>();
+                          pathPaneBeanMap=new ConcurrentHashMap<>();
                           loadCenterPathPanel();
                           DefaultTreeModel model = new DefaultTreeModel(rootNode);  
                           tree.setModel(model);  
@@ -164,6 +166,20 @@ public class MainJPanel extends JPanel {
             	  }
             		reNamePaneBeanMap.put(MaxKey+1,new ReNamePaneBean());
             		loadNorthPanel();
+            }
+        });
+        reChooseFileButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	for(String key:pathPaneBeanMap.keySet()){
+            		PathPaneBean pathPaneBean=pathPaneBeanMap.get(key);
+            		if(pathPaneBean!=null&&pathPaneBean.getCheckBoxTreeNode()!=null){
+            		pathPaneBean.getCheckBoxTreeNode().setSelected(false);
+            		 ((DefaultTreeModel)tree.getModel()).nodeStructureChanged(pathPaneBean.getCheckBoxTreeNode());
+            		 } 
+            	}
+            	pathPaneBeanMap=new ConcurrentHashMap<>();
+            	loadCenterPathPanel();
             }
         });
         
@@ -260,9 +276,9 @@ public class MainJPanel extends JPanel {
     }
 
     public void putPathPaneBean(String oldFilePathName,JTextArea oldPathNametextArea,
-			JTextArea newPathNametextArea) {
+			JTextArea newPathNametextArea,CheckBoxTreeNode checkBoxTreeNode) {
 
-    	  pathPaneBeanMap.put(oldFilePathName,new PathPaneBean(oldPathNametextArea,newPathNametextArea));
+    	  pathPaneBeanMap.put(oldFilePathName,new PathPaneBean(oldPathNametextArea,newPathNametextArea,checkBoxTreeNode));
     		loadCenterPathPanel();
 	}
 	private void loadNorthPanel() {
@@ -282,7 +298,7 @@ public class MainJPanel extends JPanel {
         northPanel.add(new JLabel());
         newfileNametextArea.setLineWrap(true);
         for(Integer key:reNamePaneBeanMap.keySet()){
-        	System.out.println(key);
+//        	System.out.println(key);
         	ReNamePaneBean reNamePaneBean=reNamePaneBeanMap.get(key);
         	northPanel.add(new JLabel("原字段:"));
             northPanel.add(reNamePaneBean.getOldNametextArea());
@@ -310,14 +326,14 @@ public class MainJPanel extends JPanel {
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints s = new GridBagConstraints();
 		s.fill = GridBagConstraints.HORIZONTAL;
-		
+		int ordeyNumber=0;//第几个
         for(String key:pathPaneBeanMap.keySet()){
         	
         	PathPaneBean pathPaneBean=pathPaneBeanMap.get(key);
+        	ordeyNumber++;
         	
-        	
-        	JLabel oldPathLabel=new JLabel("原路径:");
-        	oldPathLabel.setPreferredSize(new Dimension(50, 20));
+        	JLabel oldPathLabel=new JLabel("第"+ordeyNumber+"个原路径:");
+        	oldPathLabel.setPreferredSize(new Dimension(100, 20));
         	oldPathLabel.setForeground(Color.red);
         	centerPathPanel.add(oldPathLabel);
         	
@@ -334,7 +350,7 @@ public class MainJPanel extends JPanel {
         	layout.setConstraints(pathPaneBean.getOldPathNametextArea(), s);// 设置组件
         	
         	JLabel newPathLabel=new JLabel("复制到:");
-        	newPathLabel.setPreferredSize(new Dimension(50, 20));
+        	newPathLabel.setPreferredSize(new Dimension(100, 20));
         	s.gridwidth = 1;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
         	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
         	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
@@ -385,18 +401,12 @@ public class MainJPanel extends JPanel {
         // 如果不显示隐藏文件，则返回
         if (dir.isHidden() && !showHiddenFilesCheckbox.isSelected()) { return; }
 
-//        final StringBuilder pathBuffer = new StringBuilder(1024);
-
-        // 访问当前目录
-//        pathBuffer.append(createPath(dir, level));
-//         childrenNode = new CheckBoxTreeNode(); 
 
         // 访问文档
         for (File doc : dir.listFiles(docFilter)) {
             if (doc.isHidden() && !showHiddenFilesCheckbox.isSelected()) {
                 continue;
             }
-//            pathBuffer.append(createPath(doc, level + 1));
             
             childrenNode = new CheckBoxTreeNode(doc,mainJPanel); 
             parentNode.add(childrenNode);
@@ -412,37 +422,9 @@ public class MainJPanel extends JPanel {
         }
     }
 
-   /* // 创建文件的路径
-    public String createPath(File file, int level) {
-        StringBuilder pathBuffer = new StringBuilder(128);
-        pathBuffer.append(getPathIndex(level)).append(file.getName()).append("\n");
-
-        return pathBuffer.toString();
-    }*/
-
-   /* // 创建目录的缩进
-    private String getPathIndex(int level) {
-        // 如果不存在，则创建
-        if (pathIndexes.get(level) == null) {
-            StringBuilder indexBuffer = new StringBuilder(128);
-            for (int i = 0; i < level; ++i) {
-                indexBuffer.append("|        ");
-            }
-
-            indexBuffer.append("|----");
-            pathIndexes.put(Integer.valueOf(level), indexBuffer.toString());
-            return indexBuffer.toString();
-        } else {
-            return pathIndexes.get(level);
-        }
-    }*/
-
     // 创建主窗口
     public static void createGUIAndShow() {
         JFrame frame = new JFrame("目录结构树");
-      
-        
-
         Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
         int w = 1000;
         int h = 700;
@@ -453,15 +435,11 @@ public class MainJPanel extends JPanel {
         frame.setBounds(x, y, w, h);
         frame.setContentPane(new MainJPanel());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-        
-        
         frame.setVisible(true);
-        
-        
     }
 
     public void readFileToTextArea(String file){
-    	textArea.setText(FileUtils.read(file,CharsetName)); //"GBK", "gb2312"));
+    	textArea.setText(FileUtils.read(file,CharsetName)); 
     }
  
 }
