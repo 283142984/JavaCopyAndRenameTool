@@ -395,15 +395,33 @@ public class MainJPanel extends JPanel {
         // 2. docs path that located in this dir
         // 3. sub dirs path
     	if(parentNode==null){return;}
+    	if (stopped) { return; }
+    	//如果文件夹其下有且只有一个文件夹，就合并名，用.连接（仿idea等IDE）
+    	 File[] dirFile= dir.listFiles(dirFilter);
+    	 File[] docFile= dir.listFiles(docFilter);
+    	if(dirFile.length==1&&docFile.length==0){
+    		CheckBoxTreeNode parentFatherNode=	(pathTree.CheckBoxTreeNode) parentNode.getParent();
+    		File thisFile=	dirFile[0];
+    		CheckBoxTreeNode CheckBoxTreeNode=new CheckBoxTreeNode(
+    				new File(parentNode.toString()+"."+	thisFile.getName()),mainJPanel);
+    		parentFatherNode.add(CheckBoxTreeNode);
+    		parentFatherNode.remove(parentNode);
+    		 walkTree(thisFile, level + 1,CheckBoxTreeNode);
+    		 return;
+    	}
+    	
+    	
     	CheckBoxTreeNode childrenNode=null;
-        if (stopped) { return; }
 
-        // 如果不显示隐藏文件，则返回
-        if (dir.isHidden() && !showHiddenFilesCheckbox.isSelected()) { return; }
+        // 如果不显示隐藏文件，删除本身并 返回
+        if (dir.isHidden() && !showHiddenFilesCheckbox.isSelected()) { 
+        	CheckBoxTreeNode parentFatherNode=	(pathTree.CheckBoxTreeNode) parentNode.getParent();
+        	parentFatherNode.remove(parentNode);
+        	return; }
 
 
         // 访问文档
-        for (File doc : dir.listFiles(docFilter)) {
+        for (File doc : docFile) {
             if (doc.isHidden() && !showHiddenFilesCheckbox.isSelected()) {
                 continue;
             }
@@ -413,9 +431,9 @@ public class MainJPanel extends JPanel {
         }
 
        
-
+      
         // 递归遍历子目录
-        for (File subDir : dir.listFiles(dirFilter)) {
+        for (File subDir :dirFile) {
         	childrenNode = new CheckBoxTreeNode(subDir,mainJPanel); 
             parentNode.add(childrenNode);
             walkTree(subDir, level + 1,childrenNode);
