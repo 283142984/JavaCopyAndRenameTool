@@ -45,7 +45,7 @@ public class FileUtils {
 	    }
 	 //"UTF-8"
 	   @SuppressWarnings("finally")
-	public static boolean save(String fileContent,String outputFilePath,String readCharsetName) {
+	public static boolean save(String fileContent,String outputFilePath,String charsetName) {
 		   boolean isSuccess=false;
 		   FileOutputStream fos  = null;
 		   OutputStreamWriter osw = null;

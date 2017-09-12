@@ -46,8 +46,9 @@ public class MainJPanel extends JPanel {
     private JCheckBox showHiddenFilesCheckbox = new JCheckBox("显示隐藏文件", false);
     private  JPanel northPanel = new JPanel();
     private  JPanel centerPanel = new JPanel();
-    private  JPanel centerPathPanel = new JPanel();
-    private  JPanel centerButtonPanel = new JPanel();
+    private  JPanel centerPathPanel = new JPanel();//中间右方路径设置区域
+    private  JPanel centerButtonPanel = new JPanel();//中间按钮区域
+    
 //    private Map<Integer, String> pathIndexes = new HashMap<Integer, String>();
     private FileFilter docFilter = new DocFilter(); // 文档过滤器
     private FileFilter dirFilter = new DirFilter(); // 文件夹过滤器
@@ -56,8 +57,9 @@ public class MainJPanel extends JPanel {
     public JTextArea newfileNametextArea=new JTextArea();//新文件名Po
     private  JLabel oldfileNameLabel =new JLabel("旧文件Po名:");  
     private  JLabel newfileNameLabel =new JLabel("新文件Po名:");  
-    public JScrollPane jTreescroll;//树形区域
-    public JTextArea textArea;//输入区域
+    public JScrollPane jTreescroll;//左方树形区域
+    public JTextArea textArea;//底部文本显示
+    
     public Map<Integer,ReNamePaneBean> reNamePaneBeanMap=new LinkedHashMap<>();//保存reName对象 Map
     public Map<String,PathPaneBean> pathPaneBeanMap=new ConcurrentHashMap<>();//保存path文件路径对象 Map
     private JButton reChooseFileButton = new JButton("重新选择文件");
@@ -67,7 +69,7 @@ public class MainJPanel extends JPanel {
     private String CharsetName="UTF-8";
     JTree tree = new JTree();  
     CheckBoxTreeNode rootNode ;
-    private MainJPanel mainJPanel;
+    private MainJPanel mainJPanel;//自身引用
     public MainJPanel() {
         initGui();
         mainJPanel=this;
@@ -77,6 +79,11 @@ public class MainJPanel extends JPanel {
     private void initGui() {
         this.setLayout(new BorderLayout());
 
+        
+//        JScrollPane northPane = new JScrollPane(northPanel);
+//        northPane.setHorizontalScrollBarPolicy (JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+//        northPane.setVerticalScrollBarPolicy (JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+//        northPane.setPreferredSize(new Dimension(800, 100));
         loadNorthPanel();
         this.add(northPanel, BorderLayout.NORTH);
 
@@ -284,40 +291,122 @@ public class MainJPanel extends JPanel {
 	private void loadNorthPanel() {
 		northPanel.removeAll();
 		northPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+		GridBagLayout layout = new GridBagLayout();
+		GridBagConstraints s = new GridBagConstraints();
+		s.fill = GridBagConstraints.BOTH;
+		
+		showHiddenFilesCheckbox.setPreferredSize(new Dimension(150, 25));
+		s.gridwidth = 1;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
+    	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+    	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+    	layout.setConstraints(showHiddenFilesCheckbox, s);// 设置组件
         northPanel.add(showHiddenFilesCheckbox);
-        northPanel.add(browseButton);
-        northPanel.add(stopButton);
-        northPanel.add(addReNameButton);
-        northPanel.add(new JLabel());
         
+        browseButton.setPreferredSize(new Dimension(150, 25));
+		s.gridwidth = 1;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
+    	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+    	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+    	layout.setConstraints(browseButton, s);// 设置组件
+        northPanel.add(browseButton);
+        
+        stopButton.setPreferredSize(new Dimension(150, 25));
+		s.gridwidth = 1;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
+    	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+    	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+    	layout.setConstraints(stopButton, s);// 设置组件
+        northPanel.add(stopButton);
+        
+        addReNameButton.setPreferredSize(new Dimension(150, 25));
+     		s.gridwidth = 0;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
+         	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+         	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+         	layout.setConstraints(addReNameButton, s);// 设置组件
+        northPanel.add(addReNameButton);
+        
+        oldfileNameLabel.setPreferredSize(new Dimension(150, 25));
+ 		s.gridwidth = 1;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
+     	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+     	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+     	layout.setConstraints(oldfileNameLabel, s);// 设置组件
         northPanel.add(oldfileNameLabel);
+        
+        oldfileNametextArea.setPreferredSize(new Dimension(150, 25));
+ 		s.gridwidth = 1;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
+     	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+     	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+     	layout.setConstraints(oldfileNametextArea, s);// 设置组件
         northPanel.add(oldfileNametextArea);
         oldfileNametextArea.setLineWrap(true);
+        
+        newfileNameLabel.setPreferredSize(new Dimension(150, 25));
+ 		s.gridwidth = 1;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
+     	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+     	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+     	layout.setConstraints(newfileNameLabel, s);// 设置组件
         northPanel.add(newfileNameLabel);
+        
+        newfileNametextArea.setPreferredSize(new Dimension(150, 25));
+ 		s.gridwidth = 0;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
+     	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+     	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+     	layout.setConstraints(newfileNametextArea, s);// 设置组件
         northPanel.add(newfileNametextArea);
-        northPanel.add(new JLabel());
         newfileNametextArea.setLineWrap(true);
+        
         for(Integer key:reNamePaneBeanMap.keySet()){
 //        	System.out.println(key);
         	ReNamePaneBean reNamePaneBean=reNamePaneBeanMap.get(key);
-        	northPanel.add(new JLabel("原字段:"));
-            northPanel.add(reNamePaneBean.getOldNametextArea());
-            reNamePaneBean.getOldNametextArea().setLineWrap(true);
-            northPanel.add(new JLabel("该更为:"));
-            northPanel.add(reNamePaneBean.getNewNametextArea());
-            reNamePaneBean.getNewNametextArea().setLineWrap(true);
+        	
+        	JLabel oldJLabel=new JLabel("原字段:");
+        	oldJLabel.setPreferredSize(new Dimension(150, 25));
+       		s.gridwidth = 1;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
+           	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+           	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+           	layout.setConstraints(oldJLabel, s);// 设置组件
+        	northPanel.add(oldJLabel);
+        
+        	JTextArea oldNametextArea=reNamePaneBean.getOldNametextArea();
+        	oldNametextArea.setPreferredSize(new Dimension(150, 25));
+       		s.gridwidth = 1;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
+           	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+           	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+           	layout.setConstraints(oldNametextArea, s);// 设置组件
+            northPanel.add(oldNametextArea);
+            oldNametextArea.setLineWrap(true);
+            
+            JLabel newJLabel=new JLabel("该更为:");
+            newJLabel.setPreferredSize(new Dimension(150, 25));
+       		s.gridwidth = 1;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
+           	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+           	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+           	layout.setConstraints(newJLabel, s);// 设置组件
+            northPanel.add(newJLabel);
+            
+            JTextArea newNametextArea=reNamePaneBean.getNewNametextArea();
+            newNametextArea.setPreferredSize(new Dimension(150, 25));
+       		s.gridwidth = 1;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
+           	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+           	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+           	layout.setConstraints(newNametextArea, s);// 设置组件
+            northPanel.add(newNametextArea);
+            newNametextArea.setLineWrap(true);
+            
             JButton deleteButton=new JButton("删除");
             deleteButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                 	deleteReNamePaneBean(key);
                 }
-
 				
             });
+            deleteButton.setPreferredSize(new Dimension(150, 25));
+       		s.gridwidth = 0;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
+           	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+           	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+           	layout.setConstraints(deleteButton, s);// 设置组件
             northPanel.add(deleteButton);
         }
-        northPanel.setLayout(new GridLayout(2+reNamePaneBeanMap.size(),5));
+        northPanel.setLayout(layout);
         northPanel.updateUI();
 	}
 	
@@ -333,7 +422,7 @@ public class MainJPanel extends JPanel {
         	ordeyNumber++;
         	
         	JLabel oldPathLabel=new JLabel("第"+ordeyNumber+"个原路径:");
-        	oldPathLabel.setPreferredSize(new Dimension(100, 20));
+        	oldPathLabel.setPreferredSize(new Dimension(150, 20));
         	oldPathLabel.setForeground(Color.red);
         	centerPathPanel.add(oldPathLabel);
         	
@@ -350,7 +439,7 @@ public class MainJPanel extends JPanel {
         	layout.setConstraints(pathPaneBean.getOldPathNametextArea(), s);// 设置组件
         	
         	JLabel newPathLabel=new JLabel("复制到:");
-        	newPathLabel.setPreferredSize(new Dimension(100, 20));
+        	newPathLabel.setPreferredSize(new Dimension(150, 20));
         	s.gridwidth = 1;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
         	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
         	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
