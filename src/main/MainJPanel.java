@@ -6,7 +6,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,10 +35,12 @@ import bean.ReNamePaneBean;
 import pathTree.CheckBoxTreeCellRenderer;
 import pathTree.CheckBoxTreeNode;
 import pathTree.CheckBoxTreeNodeSelectionListener;
+import waitingPanel.InfiniteProgressPanel;
 
 public class MainJPanel extends JPanel {
     private static final long serialVersionUID = 1L;
-
+    static JFrame frame ;
+    InfiniteProgressPanel glasspane ;//等待条
     private JButton stopButton = new JButton("停止扫描（未开始）");
     private JButton browseButton = new JButton("选择文件夹");
     private JButton addReNameButton = new JButton("添加替换字段");
@@ -79,6 +80,19 @@ public class MainJPanel extends JPanel {
     private void initGui() {
         this.setLayout(new BorderLayout());
 
+        
+       
+     // ...
+      glasspane = new InfiniteProgressPanel();
+     	Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+     		glasspane.setBounds(100, 100, (dimension.width) / 2, (dimension.height) / 2);
+     frame.setGlassPane(glasspane);
+//     glasspane.start();//开始动画加载效果
+//     frame.setVisible(true);
+      
+     // Later, to disable,在合适的地方关闭动画效果
+//     glasspane.stop();
+        
         
 //        JScrollPane northPane = new JScrollPane(northPanel);
 //        northPane.setHorizontalScrollBarPolicy (JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -146,9 +160,12 @@ public class MainJPanel extends JPanel {
                             walkTree(dir, 0,rootNode);
                             jTreescroll.updateUI();
                             if( stopped == false)
-                            stopButton.setText("停止扫描（扫描完成）");
-                            else
+                            { stopButton.setText("停止扫描（扫描完成）");
+                            
+                            }
+                            else{
                             stopButton.setText("停止扫描（扫描中断）");
+                            }
                         }
                     });
                     t.start();
@@ -230,6 +247,7 @@ public class MainJPanel extends JPanel {
             		JOptionPane.showMessageDialog(null, "没有选定文件！", "错误", JOptionPane.ERROR_MESSAGE); 
             		return;
             	}
+            	  glasspane.start();//开始动画加载效果
             	for(String key:pathPaneBeanMap.keySet()){
             		PathPaneBean pathPaneBean=pathPaneBeanMap.get(key);
             		String filePath=pathPaneBean.getOldPathNametextArea().getText();
@@ -242,7 +260,7 @@ public class MainJPanel extends JPanel {
             	   	}
             		FileUtils.save(fileContent, filePath, CharsetName);
             	}
-            	
+            	  glasspane.stop();//结束动画
             	JOptionPane.showMessageDialog(null, "成功替换！", "成功", JOptionPane.OK_OPTION); 	
             	
             }
@@ -258,6 +276,7 @@ public class MainJPanel extends JPanel {
             		JOptionPane.showMessageDialog(null, "没有选定文件！", "错误", JOptionPane.ERROR_MESSAGE); 
             		return;
             	}
+            	  glasspane.start();//开始动画加载效果
             	for(String key:pathPaneBeanMap.keySet()){
             		PathPaneBean pathPaneBean=pathPaneBeanMap.get(key);
             		String oldfilePath=pathPaneBean.getOldPathNametextArea().getText();
@@ -274,7 +293,7 @@ public class MainJPanel extends JPanel {
             	   	}
             		FileUtils.save(fileContent, newfilePath, CharsetName);
             	}
-            	
+            	  glasspane.stop();//结束动画
             	JOptionPane.showMessageDialog(null, "成功复制并且替换！", "成功", JOptionPane.OK_OPTION); 	
             	
             
@@ -531,7 +550,7 @@ public class MainJPanel extends JPanel {
 
     // 创建主窗口
     public static void createGUIAndShow() {
-        JFrame frame = new JFrame("目录结构树");
+        frame = new JFrame("目录结构树");
         Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
         int w = 1000;
         int h = 700;
