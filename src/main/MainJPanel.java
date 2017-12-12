@@ -247,7 +247,7 @@ public class MainJPanel extends JPanel {
             		JOptionPane.showMessageDialog(null, "没有选定文件！", "错误", JOptionPane.ERROR_MESSAGE); 
             		return;
             	}
-            	  glasspane.start();//开始动画加载效果
+//            	  glasspane.start();//开始动画加载效果
             	for(String key:pathPaneBeanMap.keySet()){
             		PathPaneBean pathPaneBean=pathPaneBeanMap.get(key);
             		String filePath=pathPaneBean.getOldPathNametextArea().getText();
@@ -260,7 +260,7 @@ public class MainJPanel extends JPanel {
             	   	}
             		FileUtils.save(fileContent, filePath, CharsetName);
             	}
-            	  glasspane.stop();//结束动画
+//            	  glasspane.stop();//结束动画
             	JOptionPane.showMessageDialog(null, "成功替换！", "成功", JOptionPane.OK_OPTION); 	
             	
             }
@@ -276,7 +276,7 @@ public class MainJPanel extends JPanel {
             		JOptionPane.showMessageDialog(null, "没有选定文件！", "错误", JOptionPane.ERROR_MESSAGE); 
             		return;
             	}
-            	  glasspane.start();//开始动画加载效果
+//            	  glasspane.start();//开始动画加载效果
             	for(String key:pathPaneBeanMap.keySet()){
             		PathPaneBean pathPaneBean=pathPaneBeanMap.get(key);
             		String oldfilePath=pathPaneBean.getOldPathNametextArea().getText();
@@ -293,7 +293,7 @@ public class MainJPanel extends JPanel {
             	   	}
             		FileUtils.save(fileContent, newfilePath, CharsetName);
             	}
-            	  glasspane.stop();//结束动画
+//            	  glasspane.stop();//结束动画
             	JOptionPane.showMessageDialog(null, "成功复制并且替换！", "成功", JOptionPane.OK_OPTION); 	
             	
             
