@@ -32,7 +32,7 @@ public class CheckBoxTreeNodeSelectionListener extends MouseAdapter
             {  
                 boolean isSelected = !node.isSelected();  
                 node.setSelected(isSelected);  
-                System.out.println(node);
+//                System.out.println(node);
                 if(node.getChildCount()==0){//说明是最后的
                 	mainJPanel.readFileToTextArea(node.toString());
                 	

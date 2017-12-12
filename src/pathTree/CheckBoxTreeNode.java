@@ -111,6 +111,7 @@ public class CheckBoxTreeNode extends DefaultMutableTreeNode
         }  
     }
 
+
 	public void newPathArea(CheckBoxTreeNode node) {
 		if(node.getChildCount()!=0)return;
 		JTextArea oldPathNametextArea=new JTextArea(node.toString());
@@ -129,7 +130,7 @@ public class CheckBoxTreeNode extends DefaultMutableTreeNode
 			areaString= beforeFileNamePath+fileName;
 		}
 		 JTextArea newPathNametextArea=new JTextArea(areaString);
-		mainJPanel.putPathPaneBean(node.toString(),oldPathNametextArea,newPathNametextArea);
+		mainJPanel.putPathPaneBean(node.toString(),oldPathNametextArea,newPathNametextArea,node);
 	} 
 	public void deletePathArea(CheckBoxTreeNode node) {
 		  mainJPanel.deletePathPaneBean(node.toString());
