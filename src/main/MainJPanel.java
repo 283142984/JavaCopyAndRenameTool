@@ -1,34 +1,4 @@
 package main;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileFilter;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTree;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.tree.DefaultTreeModel;
-
 import Utils.FileUtils;
 import bean.PathPaneBean;
 import bean.ReNamePaneBean;
@@ -36,6 +6,17 @@ import pathTree.CheckBoxTreeCellRenderer;
 import pathTree.CheckBoxTreeNode;
 import pathTree.CheckBoxTreeNodeSelectionListener;
 import waitingPanel.InfiniteProgressPanel;
+
+import javax.swing.*;
+import javax.swing.tree.DefaultTreeModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileFilter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MainJPanel extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -387,7 +368,7 @@ public class MainJPanel extends JPanel {
         	JTextArea oldNametextArea=reNamePaneBean.getOldNametextArea();
         	oldNametextArea.setPreferredSize(new Dimension(150, 25));
        		s.gridwidth = 1;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
-           	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+           	s.weightx = 0.25;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
            	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
            	layout.setConstraints(oldNametextArea, s);// 设置组件
             northPanel.add(oldNametextArea);
@@ -404,7 +385,7 @@ public class MainJPanel extends JPanel {
             JTextArea newNametextArea=reNamePaneBean.getNewNametextArea();
             newNametextArea.setPreferredSize(new Dimension(150, 25));
        		s.gridwidth = 1;// 该方法是设置组件水平所占用的格子数，如果为0，就说明该组件是该行的最后一个
-           	s.weightx = 0;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
+           	s.weightx = 0.25;// 该方法设置组件水平的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
            	s.weighty = 0;// 该方法设置组件垂直的拉伸幅度，如果为0就说明不拉伸，不为0就随着窗口增大进行拉伸，0到1之间
            	layout.setConstraints(newNametextArea, s);// 设置组件
             northPanel.add(newNametextArea);
